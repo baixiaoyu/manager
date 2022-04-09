@@ -51,6 +51,15 @@ class Orchestrator(object):
         path = path or self.config['path']
         return "http://%s:%s/api/%s" % (self.config['orchestrator']['host'], self.config['orchestrator']['port'], path)
 
+    def detect_leader_api(self, path=None):
+        orchestrator_api = self.config['orchestrator']['orchestrator_api']
+        for api in str.split(orchestrator_api," "):
+            url = api + "/leader-check"
+            response = requests.get(url, auth=(self.config['orchestrator']['username'], self.config['orchestrator']['password']))
+            if response.status_code == 200:
+                url = "%s/%s" % (api, path)
+                return url
+
     def response_ok (self, data):
         return 'Code' in data and data['Code'] == 'OK' or False
 
@@ -66,7 +75,12 @@ class Orchestrator(object):
     def get(self, path):
         self.logger.debug("Retrieving JSON data from : %s" % path)
         try:
-            response = requests.get(self.make_url(path), auth=(self.config['orchestrator']['username'], self.config['orchestrator']['password']))
+            if self.config['orchestrator']['orchestrator_api'] == "" :
+                response = requests.get(self.make_url(path), auth=(self.config['orchestrator']['username'], self.config['orchestrator']['password']))
+            else:
+                url = self.detect_leader_api(path)
+                response = requests.get(url, auth=(self.config['orchestrator']['username'], self.config['orchestrator']['password']))
+
             response.raise_for_status()
             data = response.json()
             if self.debug:
@@ -78,8 +92,9 @@ class Orchestrator(object):
 
 
     def instance_action(self, path,parmeter, hostname, port="3306"):
+
         if parmeter is not None:
-            data = self.get('%s/%s/%s/%s' % (path, hostname, port, parmeter))
+            data = self.get('%s/%s/%s/%s' % (path, hostname, port,parmeter))
         elif hostname is None and port is None:
             data = self.get('%s' % (path))
         else:

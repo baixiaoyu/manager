@@ -2,6 +2,7 @@
 # All attributes required.
 orchestrator:
   host: localhost
+  orchestrator_api: http://192.168.36.129:3000/api http://192.168.36.130:3000/api http://192.168.36.131:3000/api
   port: 3000
   username: api
   password: apiusersecret
