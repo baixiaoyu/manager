@@ -77,8 +77,14 @@ class Orchestrator(object):
             return False
 
 
-    def instance_action(self, path, hostname, port=3306):
-        data = self.get('%s/%s/%d' % (path, hostname, port))
+    def instance_action(self, path,parmeter, hostname, port="3306"):
+        if parmeter is not None:
+            data = self.get('%s/%s/%s/%s' % (path, hostname, port, parmeter))
+        elif hostname is None and port is None:
+            data = self.get('%s' % (path))
+        else:
+            data = self.get('%s/%s/%s' % (path, hostname, port))
+
         if data:
             success, message = self.parse_action_response(data)
             self.logger.debug("Instance action message: %s" % message)

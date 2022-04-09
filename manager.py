@@ -14,7 +14,7 @@ class AutoUpdater(Orchestrator):
 
     def __init__(self, config_file=None, args={}):
         super().__init__(config_file, args)
-        self.action_white_list= ["mysql-stop","mysql-start","set-read-only","set-writeable"]
+        self.action_white_list= ["mysql-stop","mysql-start","set-read-only","set-writeable","audittest"]
 
     # def set_instance_read_only(self, hostname, port=3306):
     #     self.logger.debug("Setting %s:%d writable" % (hostname, port))
